@@ -1,0 +1,13 @@
+{
+  "iterations": 600,
+  "depth": 6,
+  "learning_rate": 0.05,
+  "random_seed": 42,
+  "thread_count": 4,
+  "test_fraction": 0.2,
+  "validation_fraction": 0.2,
+  "early_stopping_rounds": 60,
+  "max_false_positive_rate": 0.01,
+  "review_threshold": 40,
+  "window_seconds": 3600
+}

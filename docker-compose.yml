@@ -1,0 +1,36 @@
+name: swagowners
+
+services:
+  db:
+    build: ./backend_antifrod/db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-antifraud}
+      POSTGRES_USER: ${POSTGRES_USER:-antifraud}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Заполните POSTGRES_PASSWORD в .env}
+      TZ: ${CDR_TIMEZONE:-Europe/Moscow}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build: ./backend_antifrod
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-antifraud}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-antifraud}
+      CDR_DIR: /app/cdr_out
+      ML_MODEL_DIR: /app/models/release
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
+
+  frontend:
+    build: ./ui_antifrod
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"

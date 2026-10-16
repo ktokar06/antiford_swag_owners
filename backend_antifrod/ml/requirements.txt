@@ -1,0 +1,3 @@
+-r ../requirements.txt
+catboost==1.2.8
+scikit-learn==1.7.2

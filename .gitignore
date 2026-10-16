@@ -52,13 +52,10 @@ pip-delete-this-directory.txt
 db.sqlite3
 db.sqlite3-journal
 
-# Alembic
-# (versions/ — коммитим, не игнорим)
-alembic/versions/*.pyc
-
 # ML artifacts
 artifacts/
 *.cbm
+!backend_antifrod/models/release/model.cbm
 *.pt
 *.pkl
 *.joblib

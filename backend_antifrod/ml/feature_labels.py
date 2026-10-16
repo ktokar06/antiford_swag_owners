@@ -1,0 +1,23 @@
+"""Подписи признаков для объяснения модели оператору."""
+LABELS = {
+ "type":"Тип CDR", "source_group":"Сеть источника", "destination_group":"Сеть адресата",
+ "duration":"Длительность", "hour":"Час начала", "weekday":"День недели", "is_night":"Ночное время",
+ "is_short":"Короткий вызов", "is_unanswered":"Нулевая длительность", "is_forwarded":"Переадресация",
+ "has_imsi":"Наличие IMSI", "cross_operator":"Разные операторы",
+ "history_calls":"Вызовов за час", "history_unique_targets":"Уникальных адресатов за час",
+ "history_regions":"Префиксов адресатов за час", "history_short_share":"Доля коротких за час",
+ "history_unanswered_share":"Доля неотвеченных за час", "history_mean_duration":"Средняя длительность за час",
+ "history_duration_std":"Разброс длительности", "history_incoming":"Входящих за час",
+ "history_reciprocal_share":"Взаимность контактов", "history_pair_calls":"Повторные вызовы адресату",
+ "history_reverse_pair_calls":"Обратные вызовы", "seconds_since_previous":"Пауза между вызовами",
+ "imsi_number_count":"Номеров на IMSI", "imsi_active_calls":"Активных вызовов IMSI",
+ "caller_imsi_count_24h":"Разных IMSI у номера за сутки", "caller_active_calls":"Одновременные вызовы номера",
+ "caller_other_imsi_active":"Наложения с другим IMSI", "caller_calls_24h":"Вызовов за сутки",
+ "caller_normal_share_24h":"Доля нормальных разговоров за сутки", "caller_night_share_24h":"Доля ночных за сутки",
+ "caller_business_share_24h":"Доля в рабочее время", "caller_unique_share_24h":"Доля уникальных адресатов",
+ "caller_active_hours_24h":"Активных часов", "caller_peak_hour_share_24h":"Концентрация в пиковом часу",
+ "caller_adjacent_step_share_24h":"Последовательность номеров B", "target_step_is_one":"Следующий номер диапазона",
+ "caller_forward_destination_count_24h":"Назначений переадресации", "forward_destination_source_count_24h":"Источников на общий номер C",
+ "forward_destination_normal_share_24h":"Нормальные разговоры на общий C", "victim_short_city_sources_2h":"Короткие городские источники у адресата",
+ "victim_previous_long_calls_2h":"Предыдущие длинные вызовы адресату", "caller_duration_6_20_share_24h":"Доля уведомлений 6–20 секунд",
+}
