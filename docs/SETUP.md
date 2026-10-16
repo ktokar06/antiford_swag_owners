@@ -1,7 +1,5 @@
 # Запуск SWAG OWNERS
 
-[Описание проекта, условия задачи, оценивание и команда → README.md](README.md)
-
 Инструкция по первому запуску, входу, загрузке данных и обслуживанию проекта.
 
 ## Клонирование репозитория
@@ -11,13 +9,12 @@ git clone https://github.com/ktokar06/antiford_swag_owners.git
 
 cd antiford_swag_owners
 ```
-
 ## Запуск: от папки до входа
 
 1. Установите и запустите **Docker Desktop**.
-2. Откройте папку проекта в VS Code или в другом Ide 
-3. Откройте единственный файл настроек **`.env` в корне**. Он уже заполнен.
-   Данные входа: значения `OPERATOR_EMAIL` и `OPERATOR_PASSWORD` после `=`.
+2. Откройте папку проекта в **VS Code** или в другой IDE.
+3. Откройте единственный файл настроек — **`.env` в корне проекта**. Он уже заполнен.
+   Данные для входа: значения `OPERATOR_EMAIL` и `OPERATOR_PASSWORD` после `=`. Укажите рабочую почту, чтобы на неё приходило сообщение от приложения о смене пароля.
 4. Выполните:
 
 ```bash
@@ -91,17 +88,15 @@ docker compose exec backend python -m scripts.import_dataset /app/marked_dataset
 - Интерфейс: http://localhost:8080
 - БД и модель: http://localhost:8080/health/db — `status: ok`, `schema: ml_operator_v1`,
   `engine: catboost`, хеш модели.
-- Swagger: http://localhost:8000/docs
-- 
+- Swagger (интерактивная документация): http://localhost:8000/docs
+- ReDoc (альтернативная документация): http://localhost:8000/redoc
 - Логи: `docker compose logs --tail=100 backend db`
 
 
 ## Обучение модели
 
 Готовая модель поставляется в `backend_antifrod/models/release/`.
-Для обычного запуска переобучение не требуется. Метрики и методика оценки — в
-[основном README](README.md#как-оцениваем-качество).
-
+Для обычного запуска переобучение не требуется. Метрики и методика оценки — в основном README
 Обучение из `backend_antifrod`:
 
 ```bash
