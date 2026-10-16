@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 4%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 4%;
+    --primary: 270 70% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 10% 4%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+    --accent: 270 70% 96%;
+    --accent-foreground: 270 70% 30%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 270 70% 45%;
+    --radius: 0.75rem;
+
+    --risk-low: 142 70% 45%;
+    --risk-medium: 38 92% 50%;
+    --risk-high: 0 84% 60%;
+
+    --chart-1: 270 70% 45%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 240 10% 4%;
+    --sidebar-primary: 270 70% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 270 70% 96%;
+    --sidebar-accent-foreground: 270 70% 30%;
+    --sidebar-border: 240 6% 90%;
+    --sidebar-ring: 270 70% 45%;
+
+    --font-heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+    --font-body: system-ui, 'Segoe UI', Roboto, sans-serif;
+    --font-display: system-ui, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: ui-monospace, Consolas, monospace;
+  }
+
+  .dark {
+    --background: 240 10% 4%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 6%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 6%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 270 70% 60%;
+    --primary-foreground: 240 10% 4%;
+    --secondary: 240 4% 16%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 4% 16%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 270 40% 20%;
+    --accent-foreground: 270 70% 90%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 4% 16%;
+    --input: 240 4% 16%;
+    --ring: 270 70% 60%;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+    margin: 0;
+  }
+  #root { min-height: 100svh; }
+}
