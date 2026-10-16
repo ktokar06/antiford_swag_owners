@@ -200,6 +200,7 @@ HTTP-проверок и отдельные проверки загрузки, �
 | Разработчик | Gapeev Alexey (@diadene)  |
 | Разработчик | Sorokin Gleb (@hochyhh)   |
 | Разработчик | Smolin Vadim (@moybobyr)  |
+| Разработчик | Sinitsyn Ilya (@PbIZHbIK) | 
 
 ## Контакты
 
