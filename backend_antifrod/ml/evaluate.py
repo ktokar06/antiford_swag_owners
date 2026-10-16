@@ -14,6 +14,7 @@ def choose_threshold(y, probabilities, max_fpr, review_threshold):
     y, scores = np.asarray(y, dtype=int), ratings(probabilities)
     if set(y) != {0, 1}:
         raise ValueError("Validation должен содержать и фрод, и легитимные вызовы")
+    # 101 означает: ни один балл 0..100 не допускает автоблокировку.
     for threshold in range(review_threshold + 1, 102):
         if ((scores >= threshold) & (y == 0)).sum() / (y == 0).sum() <= max_fpr:
             return threshold

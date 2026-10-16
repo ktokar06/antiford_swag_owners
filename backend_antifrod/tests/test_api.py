@@ -1,3 +1,4 @@
+"""HTTP-уровень без БД: авторизация и валидация. Нужен httpx."""
 import unittest
 
 from tests import _env  # noqa: F401
@@ -21,7 +22,7 @@ class ApiAuthTest(unittest.TestCase):
 
         app.dependency_overrides[get_db_dep] = lambda: FakeDB()
         cls.app = app
-        cls.client = TestClient(app)
+        cls.client = TestClient(app)  # без контекстного менеджера: lifespan (БД) не запускается
 
     @classmethod
     def tearDownClass(cls):

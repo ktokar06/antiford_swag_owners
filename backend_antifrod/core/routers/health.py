@@ -28,4 +28,5 @@ def health_db():
                 "engine": "catboost", "model_version": model.metadata["model_sha256"]}
     except Exception:
         log.exception("DB healthcheck failed")
+        # Детали ошибки (хост, пользователь) наружу не отдаём
         return JSONResponse(status_code=503, content={"status": "error", "db": "unreachable"})

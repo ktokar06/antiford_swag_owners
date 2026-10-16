@@ -1,36 +1,10 @@
+"""
+Сквозной тест CDR_OUT → БД → API-сервисы на реальном PostgreSQL.
+Запускается, только если задан TEST_DATABASE_URL (отдельная, ОЧИЩАЕМАЯ база!):
+    TEST_DATABASE_URL=postgresql+psycopg://antifraud:...@localhost:5432/antifraud_test python -m unittest
+"""
 import os
 import unittest
-
-from core.database import SessionLocal
-from etl import load_cdr
-from etl.load_features import compute_number_features
-from etl.refresh_graph import refresh_graph
-from services import blocks_service, call_service, cdr_service, scoring_service, stats_api_service, stats_service
-
-from services.ml_service import score_envelope
-from sqlalchemy import text
-
-from unittest.mock import patch
-from sqlalchemy import text
-from core.database import SessionLocal
-from services.scoring_service import score_calls
-
-from pathlib import Path
-from sqlalchemy import text
-from core.database import engine
-
-from core.database import SessionLocal
-from etl.load_cdr import load_bytes
-from sqlalchemy import text
-
-from sqlalchemy import select
-from core.database import SessionLocal
-from core.models.labeling import FraudScenario, FalsePositiveLabel
-from etl.load_labels import ensure_reference
-
-from sqlalchemy import text
-from sqlalchemy.exc import IntegrityError
-from core.database import engine
 
 TEST_URL = os.environ.get("TEST_DATABASE_URL")
 if TEST_URL:
@@ -40,11 +14,12 @@ from tests import _env  # noqa: E402,F401
 
 def _lines():
     out = []
+    # Веер: 4 «номера-обзвонщика» × 25 коротких вызовов на общий список целей
     for s in range(4):
         for t in range(25):
             out.append(f"01;;77700000{s:02d};02500000{t:02d};2024101402{t:02d}00;1;")
     out.append("02;250011234567890;0261234567;8991234567;20241014120000;120;")
-    out.append("02;250011234567890;0261234567;8991234567;20241014120000;120;")
+    out.append("02;250011234567890;0261234567;8991234567;20241014120000;120;")  # дубликат в файле
     out += ["bad;line", "01;;8421234567;0251234567;20241399114200;6;", "02;;8421234567;0251234567;20241014114200;6;"]
     return out
 
@@ -53,6 +28,9 @@ def _lines():
 class PipelineIntegrationTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        from pathlib import Path
+        from sqlalchemy import text
+        from core.database import engine
         with engine.begin() as c:
             c.execute(text("DROP SCHEMA public CASCADE; CREATE SCHEMA public"))
             root = Path(__file__).resolve().parents[1] / "db"
@@ -60,6 +38,12 @@ class PipelineIntegrationTest(unittest.TestCase):
                 c.exec_driver_sql((root / name).read_text())
 
     def test_full_flow(self):
+        from core.database import SessionLocal
+        from etl import load_cdr
+        from etl.load_features import compute_number_features
+        from etl.refresh_graph import refresh_graph
+        from services import blocks_service, call_service, cdr_service, scoring_service, stats_api_service, stats_service
+
         data = ("\n".join(_lines()) + "\n").encode()
         with SessionLocal() as db:
             res = load_cdr.load_bytes(db, "CDR_test.cdr", data)
@@ -94,6 +78,8 @@ class PipelineIntegrationTest(unittest.TestCase):
             log_odds = explanation["base_log_odds"] + sum(f["contribution"] for f in explanation["factors"])
             self.assertAlmostEqual(1 / (1 + math.exp(-log_odds)), detail.probability, places=8)
             self.assertEqual(detail.risk_score, round(100 * detail.probability))
+            from services.ml_service import score_envelope
+            from sqlalchemy import text
             latest = db.execute(text("SELECT id FROM call_record WHERE caller_number='7770000000' ORDER BY started_at DESC LIMIT 1")).scalar_one()
             online = score_envelope(db, _lines()[24], True)
             saved = call_service.get_call(db, latest)
@@ -108,6 +94,10 @@ class PipelineIntegrationTest(unittest.TestCase):
             self.assertGreaterEqual(blocked.total, 0)
 
     def test_model_failure_preserves_previous_decisions(self):
+        from unittest.mock import patch
+        from sqlalchemy import text
+        from core.database import SessionLocal
+        from services.scoring_service import score_calls
         with SessionLocal() as db:
             before = db.execute(text("SELECT call_id, risk_score FROM call_decision ORDER BY call_id")).all()
             with patch("services.scoring_service.get_predictor", side_effect=ValueError("bad model")):
@@ -118,6 +108,9 @@ class PipelineIntegrationTest(unittest.TestCase):
             self.assertEqual(before, after)
 
     def test_csv_labels_are_not_predictions(self):
+        from core.database import SessionLocal
+        from etl.load_cdr import load_bytes
+        from sqlalchemy import text
         data = ("type;imsi;phone_a;phone_b;time;duration;phone_c;is_fraud\n"
                 "2;250020582732825.0;8109392353;2001413931;2026-10-01 00:00:00;3;;1\n").encode()
         with SessionLocal() as db:
@@ -128,6 +121,10 @@ class PipelineIntegrationTest(unittest.TestCase):
             db.rollback()
 
     def test_scenario_reference_matches_organizers(self):
+        from sqlalchemy import select
+        from core.database import SessionLocal
+        from core.models.labeling import FraudScenario, FalsePositiveLabel
+        from etl.load_labels import ensure_reference
         with SessionLocal() as db:
             ensure_reference(db)
             db.commit()
@@ -139,6 +136,9 @@ class PipelineIntegrationTest(unittest.TestCase):
             self.assertEqual(len(legitimate), 5)
 
     def test_schema_defaults_to_operator_and_rejects_other_roles(self):
+        from sqlalchemy import text
+        from sqlalchemy.exc import IntegrityError
+        from core.database import engine
 
         with engine.begin() as connection:
             user_id = connection.execute(text("""

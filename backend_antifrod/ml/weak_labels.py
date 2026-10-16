@@ -13,6 +13,7 @@ def label_scenarios(records: pd.DataFrame) -> pd.DataFrame:
         fraud = any(c.startswith("S") for c in codes)
         legitimate = any(c.startswith("D") for c in codes)
         result.loc[position, "scenario"] = ",".join(codes)
+        # Пересечение D и S оставляем оператору; отсутствие кандидата тоже не класс 0.
         if fraud != legitimate:
             result.loc[position, "label"] = int(fraud)
     return result

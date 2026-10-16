@@ -101,6 +101,8 @@ def main():
         det = FraudScenarioDetector(df)
         scores, scenario_flags, d_flags = det.run()
         print("Пишу метки...")
+        # Пересчитываем только метки, созданные этим ETL (включая старые ошибочные
+        # значения S/D). Пользовательские evidence не удаляются.
         old_s = [f"detected {code}" for code in SCENARIOS]
         old_d = [f"false positive {code}" for code in FPS]
         db.execute(delete(PhoneNumberScenario).where(

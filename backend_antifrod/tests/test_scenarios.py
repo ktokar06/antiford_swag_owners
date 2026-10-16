@@ -10,10 +10,10 @@ def test_s4_counts_imsis_per_caller_with_overlaps():
     rows = [call(f"2024101412000{i}", imsi=f"2500112345678{i:02d}") for i in range(10)]
     frame = pd.DataFrame(rows)
     features = build_features(frame)
-
     assert features.iloc[4].caller_imsi_count_24h == 4
     assert features.iloc[4].caller_other_imsi_active == 4
     assert "S4" in set(find_candidates(frame).scenario)
+    # Будущее не меняет уже рассчитанные признаки.
     pd.testing.assert_frame_equal(features.iloc[:5], build_features(frame.iloc[:5]))
 
 
@@ -21,7 +21,6 @@ def test_victim_sequence_not_caller_sequence():
     rows = [call(f"2024101412000{i}", a=f"499000000{i}", duration=1) for i in range(4)]
     rows.append(call("20241014120100", a="0251234567", duration=900))
     f = build_features(pd.DataFrame(rows))
-
     assert f.iloc[-1].victim_short_city_sources_2h == 4
     assert find_candidates(pd.DataFrame(rows)).scenario.tolist() == ["S7"]
 
@@ -34,7 +33,6 @@ def test_d4_shared_destination_is_not_forward_chain():
         rows.append(row)
     frame = pd.DataFrame(rows)
     candidates = find_candidates(frame)
-
     assert "D4" in set(candidates.scenario)
     assert "S5" not in set(candidates.scenario)
     assert build_features(frame).iloc[-1].forward_destination_source_count_24h == 10
@@ -46,13 +44,10 @@ def test_s2_sequential_targets_and_d5_random_targets():
         date = (pd.Timestamp("2024-10-14 12:00") + pd.Timedelta(minutes=i)).strftime("%Y%m%d%H%M%S")
         rows.append(call(date, a="4991234567", b=f"025{i:07d}", duration=0 if i % 4 == 0 else 12))
     sequential = pd.DataFrame(rows)
-
     assert "S2" in set(find_candidates(sequential).scenario)
-    assert "D5" not in set(find_candidates(sequential).scenario),
-
+    assert "D5" not in set(find_candidates(sequential).scenario)
     random = sequential.copy()
     random["num_b"] = [f"025{i*7919:07d}" for i in range(40)]
-
     assert "D5" in set(find_candidates(random).scenario)
     assert "S2" not in set(find_candidates(random).scenario)
 
@@ -65,11 +60,8 @@ def test_callcenter_zero_calls_are_not_automatically_fraud():
     rows.append(call("20241014110000", a="0259999999", b="4991234567"))
     frame = pd.DataFrame(rows)
     candidates = find_candidates(frame)
-
     assert "D1" in set(candidates.scenario)
-
     labels = label_scenarios(frame)
-
     assert labels.iloc[:40].label.eq(0).all()
 
 
@@ -107,7 +99,7 @@ def test_s6_closed_group_not_high_degree_star():
     rows = [call(f"20241014{hour:02d}0000", a=numbers[hour%5], b=numbers[(hour+1)%5], duration=20)
             for hour in range(24)]
     assert "S6" in set(find_candidates(pd.DataFrame(rows)).scenario)
-
+    # Внешний контакт расширяет компоненту за предел 10: группа не закрыта.
     for i in range(10):
         rows.append(call(f"202410141200{i:02d}", a=numbers[0], b=f"899000000{i}"))
     assert "S6" not in set(find_candidates(pd.DataFrame(rows)).scenario)

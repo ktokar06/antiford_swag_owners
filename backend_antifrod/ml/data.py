@@ -21,6 +21,7 @@ CSV_ALIASES = {
 def normalize_csv_row(row, marked=False):
     row = {CSV_ALIASES.get(k, k): v for k, v in row.items()}
     if marked:
+        # Экспорт marked_dataset: pandas преобразовал тип/IMSI/номер C в числа.
         row["type"] = row["type"].zfill(2)
         for key in ("imsi", "num_a", "num_b", "num_c"):
             value = row.get(key, "") or ""

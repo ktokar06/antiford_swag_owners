@@ -25,8 +25,10 @@ ALLOWED_TYPES = {"01", "02", "03"}
 MIN_DURATION = 0
 MAX_DURATION = 86400
 
+# Тип записи → направление вызова относительно сети оператора
 DIRECTION_BY_TYPE = {"01": "outgoing", "02": "incoming", "03": "forwarded"}
 
+# Коды ошибок валидации (сохраняются в invalid_cdr_row.error_code)
 E_FIELD_COUNT = "field_count"
 E_TYPE = "invalid_type"
 E_DATE = "invalid_date"
@@ -70,9 +72,10 @@ class CdrRecord:
     num_a: str
     num_b: str
     num_c: str | None
-    started_at: datetime
+    started_at: datetime  # naive, локальное время CDR_TIMEZONE
     duration: int
 
+    # --- производные метаданные «конверта» вызова ---
     @property
     def direction(self) -> str:
         return DIRECTION_BY_TYPE[self.type]
@@ -113,6 +116,7 @@ class CdrRecord:
             return "pstn"
         if group is not None:
             return "mobile"
+        # Источник вне известных сетей — вызов пришёл через внешний шлюз
         return "sip_gateway"
 
     def row_hash(self) -> str:
@@ -122,6 +126,7 @@ class CdrRecord:
 
 def row_hash(type_: str, imsi: str | None, num_a: str, num_b: str,
              started_at: datetime, duration: int, num_c: str | None) -> str:
+    # Канонический формат хеша для дедупликации нормализованных CDR.
     key = "|".join([
         type_, imsi or "", num_a, num_b,
         started_at.strftime("%Y%m%d%H%M%S"), str(duration), num_c or "",

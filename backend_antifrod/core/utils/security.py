@@ -10,6 +10,7 @@ from core.config import settings
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 ACCESS_TOKEN_TYPE = "access"
+# bcrypt учитывает только первые 72 байта пароля — длиннее не принимаем
 MAX_PASSWORD_BYTES = 72
 
 
@@ -27,6 +28,7 @@ def verify_password(password: str, password_hash: str) -> bool:
 
 
 def hash_token(token: str) -> str:
+    """Токены сброса пароля храним в БД только в виде SHA-256."""
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
 

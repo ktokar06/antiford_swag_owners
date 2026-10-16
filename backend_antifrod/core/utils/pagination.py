@@ -32,6 +32,7 @@ def resolve_offset(cursor: str | None, offset: int | None) -> int:
 
 
 def page(rows: list, limit: int, offset: int) -> tuple[list, str | None, bool]:
+    """rows выбраны с limit + 1 — по лишней строке определяем has_more."""
     has_more = len(rows) > limit
     rows = rows[:limit]
     next_cursor = encode_cursor({"offset": offset + limit}) if has_more else None

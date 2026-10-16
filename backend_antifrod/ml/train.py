@@ -44,6 +44,7 @@ def train(frame: pd.DataFrame, output: str | Path, config: TrainConfig) -> dict:
     if frame.row_hash.duplicated().any():
         raise ValueError("Перед обучением удалите дубликаты CDR")
     splits = temporal_split(frame, config)
+    # Неразмеченные вызовы остаются в причинной истории, но не становятся классом 0.
     masks = {name: mask & frame.label.notna() for name, mask in splits.items()}
     for name, mask in masks.items():
         if set(frame.loc[mask, "label"].astype(int)) != {0, 1}:

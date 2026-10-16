@@ -32,4 +32,5 @@ def update_policy(data: PolicyUpdateIn, db: Session = Depends(get_db_dep), user:
 
 @router.post("/rescore", status_code=202)
 def rescore(_: AppUser = Depends(get_current_user)):
+    """Пересчитать признаки, граф, скоринг и статистику по уже загруженным данным (в фоне)."""
     return pipeline.start_background(load=False)

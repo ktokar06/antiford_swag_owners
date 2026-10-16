@@ -119,7 +119,7 @@ def load_lines(db: Session, filename: str, checksum: str, lines: Iterable[str], 
     db.execute(text("TRUNCATE stage_call"))
 
     total = valid = invalid = 0
-    raw_conn = db.connection().connection
+    raw_conn = db.connection().connection  # psycopg3-соединение текущей транзакции
     with raw_conn.cursor() as cur:
         with cur.copy(f"COPY stage_call ({STAGE_COLUMNS}) FROM STDIN") as copy_valid:
             invalid_rows: list[tuple] = []

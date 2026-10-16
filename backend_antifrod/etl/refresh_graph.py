@@ -73,6 +73,7 @@ def find_fans(sources: list[tuple[str, set[str], float]]) -> list[dict]:
             "members": members,
             "targets": sorted(union),
             "short_share": sum(shares) / len(shares),
+            # 0 — списки целей не пересекаются, 1 — все звонят по одному списку
             "overlap_share": (total - len(union)) / total if total else 0.0,
             "regions": sorted({t[:3] for t in union}),
         })
@@ -88,7 +89,7 @@ def load_sources(db: Session) -> list[tuple[str, set[str], float]]:
 
 
 def persist_clusters(db: Session, fans: list[dict]) -> int:
-    db.execute(text("DELETE FROM graph_cluster"))
+    db.execute(text("DELETE FROM graph_cluster"))  # члены/цели/регионы удаляются каскадом
     db.execute(text(
         "UPDATE number_feature SET has_fan_pattern = FALSE, fan_group = NULL "
         "WHERE has_fan_pattern OR fan_group IS NOT NULL"

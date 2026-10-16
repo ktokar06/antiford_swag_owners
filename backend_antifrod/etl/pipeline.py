@@ -21,7 +21,7 @@ from services import scoring_service, stats_service
 
 log = logging.getLogger(__name__)
 
-PIPELINE_LOCK_KEY = 4207151
+PIPELINE_LOCK_KEY = 4207151  # pg_advisory_lock: один пересчёт на всю БД
 
 
 @contextmanager
@@ -69,6 +69,10 @@ def run_pipeline(load: bool = True, directory: str | None = None, on_stage=None)
             db.close()
     return result
 
+
+# ---------------------------------------------------------------
+# Фоновый запуск из API: одна задача за раз, повторный запрос ставит ещё один проход
+# ---------------------------------------------------------------
 _state_lock = threading.Lock()
 _state: dict = {
     "running": False, "stage": None, "started_at": None, "finished_at": None,
