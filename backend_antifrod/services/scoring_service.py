@@ -39,7 +39,7 @@ def decide(score: int, policy: BlockingPolicy) -> str:
 
 
 def score_calls(db: Session) -> dict:
-    predictor = get_predictor(settings.ml_model_dir)  # Ошибка модели не включает fallback на правила.
+    predictor = get_predictor(settings.ml_model_dir)
     policy = get_active_policy(db)
     records = pd.DataFrame(db.execute(text("""
         SELECT id, row_hash, type, coalesce(imsi,'') imsi, caller_number num_a,
@@ -61,7 +61,6 @@ def score_calls(db: Session) -> dict:
                 scores = ratings(probability)
                 for cid, score, p, values in zip(records.id.iloc[start:start+10000], scores, probability, batch.itertuples(index=False, name=None)):
                     copy.write_row((int(cid), int(score), decide(int(score), policy), float(p), version, Jsonb(list(values)), policy.id))
-    # Атомарная замена: читатели видят предыдущий завершённый результат до commit.
     db.execute(text("DELETE FROM call_risk_factor"))
     db.execute(text("DELETE FROM call_decision"))
     db.execute(text("""INSERT INTO call_decision (call_id,risk_score,decision,probability,model_version,feature_values,policy_id)

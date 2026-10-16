@@ -5,7 +5,7 @@ from tests import _env  # noqa: F401
 
 try:
     from fastapi.testclient import TestClient
-except Exception:  # httpx не установлен
+except Exception:
     TestClient = None
 
 

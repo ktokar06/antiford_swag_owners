@@ -10,7 +10,6 @@ from core.config import settings
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 ACCESS_TOKEN_TYPE = "access"
-# bcrypt учитывает только первые 72 байта пароля — длиннее не принимаем
 MAX_PASSWORD_BYTES = 72
 
 

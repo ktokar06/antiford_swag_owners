@@ -1,4 +1,3 @@
--- Начальные справочники. Пользователь создаётся API из единственного корневого .env.
 INSERT INTO country (iso_code, name) VALUES ('RU', 'Россия'), ('ZZ', 'Не определена');
 
 INSERT INTO review_status (code, label) VALUES

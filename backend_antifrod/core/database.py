@@ -14,8 +14,6 @@ engine = create_engine(
     echo=settings.db_echo,
     pool_pre_ping=True,
     future=True,
-    # Даты CDR записаны в локальном времени оператора — сессия работает в том же поясе,
-    # чтобы date_trunc / EXTRACT(hour) давали те же сутки и часы, что и в исходных файлах.
     connect_args={"options": f"-c timezone={settings.cdr_timezone}"},
 )
 

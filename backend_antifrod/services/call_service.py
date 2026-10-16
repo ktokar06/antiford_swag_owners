@@ -214,7 +214,6 @@ def update_call(db: Session, call_id: int, patch: dict, user: AppUser) -> CallOu
         db.add(review)
     if status:
         review.status_code = status
-        # Кто и когда разобрал — фиксирует сервер, а не клиент
         review.reviewed_by = user.email if status != "pending" else None
         review.reviewed_at = datetime.now(timezone.utc) if status != "pending" else None
     if "assigned_to" in patch:

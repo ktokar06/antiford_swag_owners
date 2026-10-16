@@ -13,7 +13,6 @@ def test_s4_counts_imsis_per_caller_with_overlaps():
     assert features.iloc[4].caller_imsi_count_24h == 4
     assert features.iloc[4].caller_other_imsi_active == 4
     assert "S4" in set(find_candidates(frame).scenario)
-    # Будущее не меняет уже рассчитанные признаки.
     pd.testing.assert_frame_equal(features.iloc[:5], build_features(frame.iloc[:5]))
 
 

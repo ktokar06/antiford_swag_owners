@@ -46,7 +46,7 @@ class SecurityTest(unittest.TestCase):
             security.decode_token(refresh)
 
     def test_alg_none_rejected(self):
-        token = "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiIxIn0."  # {"alg":"none"}
+        token = "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiIxIn0."
         with self.assertRaises(security.JWTError):
             security.decode_token(token)
 
@@ -56,7 +56,7 @@ class SecurityTest(unittest.TestCase):
         self.assertFalse(security.verify_password("wrong", h))
         self.assertFalse(security.verify_password("x", "not-a-hash"))
         with self.assertRaises(ValueError):
-            security.hash_password("я" * 40)  # 80 байт > 72
+            security.hash_password("я" * 40)
 
     def test_reset_token_hash(self):
         self.assertEqual(len(security.hash_token("abc")), 64)

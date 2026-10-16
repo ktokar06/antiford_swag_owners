@@ -9,17 +9,15 @@ import unittest
 TEST_URL = os.environ.get("TEST_DATABASE_URL")
 if TEST_URL:
     os.environ["DATABASE_URL"] = TEST_URL
-from tests import _env  # noqa: E402,F401
-
+from tests import _env
 
 def _lines():
     out = []
-    # Веер: 4 «номера-обзвонщика» × 25 коротких вызовов на общий список целей
     for s in range(4):
         for t in range(25):
             out.append(f"01;;77700000{s:02d};02500000{t:02d};2024101402{t:02d}00;1;")
     out.append("02;250011234567890;0261234567;8991234567;20241014120000;120;")
-    out.append("02;250011234567890;0261234567;8991234567;20241014120000;120;")  # дубликат в файле
+    out.append("02;250011234567890;0261234567;8991234567;20241014120000;120;")
     out += ["bad;line", "01;;8421234567;0251234567;20241399114200;6;", "02;;8421234567;0251234567;20241014114200;6;"]
     return out
 

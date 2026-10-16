@@ -48,7 +48,6 @@ def find_candidates(frame):
         evidence_rows.extend((int(i), code, evidence) for i in indices)
 
     incoming = f.groupby("num_b").size()
-    # Суточные группы: произвольную смесь поведения за пять суток не считаем одним эпизодом.
     for (number, day), g in f.groupby(["num_a", "day"], sort=False):
         n = len(g)
         if n < 10:
@@ -59,13 +58,11 @@ def find_candidates(frame):
         unique = g.num_b.nunique()
         inbound = int(incoming.get(number, 0))
         city = number[:3] in CITY_CODES
-        # D1 не отвергается из-за ожидаемых 35% нулевых вызовов.
         if city and n >= 30 and g.hour.between(8, 19).mean() >= .85 and normal >= .2 and inbound > 0 and .2 <= zero <= .5:
             add("D1", g.index, f"day={day}; calls={n}; zero_share={zero:.3f}; normal_share={normal:.3f}; incoming={inbound}")
         if .4 <= night <= .8 and inbound > 0 and unique / n <= .6 and normal >= .3:
             add("D3", g.index, f"day={day}; night_share={night:.3f}; unique_share={unique/n:.3f}; incoming={inbound}")
         if 300 <= unique <= 800 and g.duration.le(2).mean() >= .9:
-            # Кандидат массовых коротких: доля 5% и платность C не доказаны.
             add("S1", g[g.duration.le(2)].index, f"day={day}; targets={unique}; short_share={g.duration.le(2).mean():.3f}; callback_not_verified")
         imsi_count = g.loc[g.imsi.ne(""), "imsi"].nunique()
         if 4 <= imsi_count <= 10:
@@ -74,7 +71,6 @@ def find_candidates(frame):
             overlap = ordered.timestamp < ends.cummax().shift()
             if overlap.any():
                 add("S4", g.index, f"day={day}; distinct_imsi={imsi_count}; overlapping_calls={int(overlap.sum())}")
-        # По 2-часовым сессиям с перекрытием на час — границы фиксированы и задокументированы.
         for start_hour in range(23):
             episode = g[g.hour.between(start_hour, start_hour + 1)]
             if len(episode) < 30:
@@ -90,7 +86,6 @@ def find_candidates(frame):
                 if len(episode) >= 30 and episode.num_b.nunique() / len(episode) >= .8 and target_adjacency(episode.num_b) <= .05:
                     add("D5", episode.index, f"day={day}; hour={hour}; calls={len(episode)}; random_targets_candidate; purpose_unknown")
 
-    # D2: повторение 2–3 часовых пиков в несколько дней, а не один короткий звонок.
     for number, g in f.groupby("num_a", sort=False):
         if len(g) < 60 or g.day.nunique() < 2 or g.duration.between(6, 20).mean() < .8:
             continue
@@ -108,7 +103,6 @@ def find_candidates(frame):
         if 10 <= sources <= 30 and len(g) >= 30 and g.duration.ge(30).mean() >= .8:
             add("D4", g.index, f"day={day}; shared_forward_destination; sources={sources}; company_membership_unknown")
 
-    # S6: слабосвязная компонента должна быть закрытой, а не просто иметь степень >=5.
     graph = nx.DiGraph()
     graph.add_edges_from(f[["num_a", "num_b"]].itertuples(index=False, name=None))
     candidates = [nodes for nodes in nx.weakly_connected_components(graph) if 5 <= len(nodes) <= 10]
@@ -117,7 +111,6 @@ def find_candidates(frame):
         if not g.empty and g.duration.between(8, 45).mean() >= .9 and g.hour.nunique() >= 20:
             add("S6", g.index, f"closed_component_size={len(nodes)}; active_hours={g.hour.nunique()}")
 
-    # S5: связи именно B→C, в пределах минуты. Без call-id это кандидат общей цепочки.
     forwarded = f[f.type.eq("03") & f.num_c.ne("")]
     for minute, g in forwarded.groupby(forwarded.timestamp.dt.floor("min")):
         if len(g) < 3:
@@ -126,7 +119,6 @@ def find_candidates(frame):
         graph.add_edges_from(g[["num_b", "num_c"]].itertuples(index=False, name=None))
         for nodes in nx.weakly_connected_components(graph):
             sub = graph.subgraph(nodes)
-            # Три последовательных ребра или цикл. Звезда hotline не подходит.
             chain = any(len({a, b, v, w}) == 4 for a, b in sub.edges
                         for v in sub.successors(b) for w in sub.successors(v))
             cycle = not nx.is_directed_acyclic_graph(sub)
@@ -147,7 +139,6 @@ def find_candidates(frame):
             if 4 <= preceding.num_a.nunique() <= 8:
                 add("S7", [i], f"preceding_city_sources={preceding.num_a.nunique()}; victim_sequence_2h; spoofing_not_verified")
 
-    # S3: только индивидуальный профиль. Общий SIM-box из 3–8 SIM CDR не доказывает.
     for (imsi, day), g in f[f.imsi.ne("")].groupby(["imsi", "day"], sort=False):
         if len(g) < 30 or g.hour.nunique() < 20 or g.num_b.nunique() != len(g):
             continue

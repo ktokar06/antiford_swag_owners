@@ -7,7 +7,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Значения-заглушки из примеров, с которыми запускаться нельзя
 WEAK_JWT_SECRETS = {
     "change-me-please-use-a-long-random-string",
     "change-me",
@@ -40,14 +39,12 @@ class Settings(BaseSettings):
     cors_origins: str = Field("http://localhost:5173,http://localhost:5174", alias="CORS_ORIGINS")
     log_level: str = Field("INFO", alias="LOG_LEVEL")
 
-    # CDR_OUT: каталог с файлами CDR_*.cdr и часовой пояс, в котором записаны даты
     cdr_dir: str = Field(str(BASE_DIR.parent / "cdr_out" / "cdr_out"), alias="CDR_DIR")
     cdr_timezone: str = Field("Europe/Moscow", alias="CDR_TIMEZONE")
     cdr_autoload: bool = Field(False, alias="CDR_AUTOLOAD")
     max_upload_mb: int = Field(200, alias="MAX_UPLOAD_MB", ge=1)
     ml_model_dir: str = Field(str(BASE_DIR / "models" / "release"), alias="ML_MODEL_DIR")
 
-    # Первый оператор создаётся при старте, если пользователей ещё нет
     operator_email: str | None = Field(None, alias="OPERATOR_EMAIL")
     operator_password: str | None = Field(None, alias="OPERATOR_PASSWORD")
 
@@ -72,7 +69,6 @@ class Settings(BaseSettings):
     @field_validator("jwt_algorithm")
     @classmethod
     def _check_jwt_algorithm(cls, v: str) -> str:
-        # Только симметричные HMAC: ключ — это JWT_SECRET; "none" запрещён
         if v not in {"HS256", "HS384", "HS512"}:
             raise ValueError("JWT_ALGORITHM должен быть HS256, HS384 или HS512")
         return v

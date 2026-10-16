@@ -1,5 +1,3 @@
--- Полная схема SWAG OWNERS. Выполняется один раз в пустой базе PostgreSQL.
--- Единственная прикладная роль: operator. Все поля ML создаются сразу.
 CREATE TABLE app_user (
     id             SERIAL PRIMARY KEY,
     email          VARCHAR(200) NOT NULL UNIQUE,

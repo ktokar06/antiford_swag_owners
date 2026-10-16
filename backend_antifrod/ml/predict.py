@@ -40,7 +40,6 @@ class Predictor:
                 explain: bool = False) -> pd.DataFrame:
         if records.empty:
             raise ValueError("Нет CDR для классификации")
-        # Целевые строки сохраняем первыми; общая история дедуплицируется по конверту.
         all_records = pd.concat([records, history], ignore_index=True) if history is not None else records.copy()
         all_records = all_records.drop_duplicates("row_hash").reset_index(drop=True)
         features = build_features(all_records, self.metadata["config"]["window_seconds"], self.metadata["feature_version"])

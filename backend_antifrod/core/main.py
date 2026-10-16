@@ -19,7 +19,6 @@ log = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     from services.ml_service import get_predictor
     get_predictor(settings.ml_model_dir)
-    # Полная схема создаётся PostgreSQL из db/001_schema.sql при первом запуске.
     with SessionLocal() as db:
         auth_service.ensure_operator(db)
     if settings.cdr_autoload:
@@ -40,7 +39,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins_list,
-    allow_credentials=False,  # токен передаётся в заголовке Authorization, cookies не используются
+    allow_credentials=False,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type"],
 )

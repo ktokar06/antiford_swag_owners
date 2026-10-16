@@ -85,7 +85,6 @@ def _apply_filters(stmt, f: dict):
     if digits:
         stmt = stmt.where(or_(PhoneNumber.number.like(f"%{digits}%"), Subscriber.external_id.like(f"%{digits}%")))
     elif f.get("search_text"):
-        # Поиск по названию региона/оператора: переводим в коды префиксов
         q = f["search_text"].strip().lower()
         codes = {c for c in telecom.HOME_CODES
                  if q in (telecom.region_name(c) or "").lower() or q in (telecom.operator_name(c) or "").lower()}

@@ -56,7 +56,7 @@ class ParseLineTest(unittest.TestCase):
         self.assertError("01;250011234567890;8421234567;0251234567;20241014114200;6;", p.E_IMSI_FORBIDDEN)
         self.assertError("02;;8421234567;0251234567;20241014114200;6;", p.E_IMSI_MISSING)
         self.assertError("02;2500112345;8421234567;0251234567;20241014114200;6;", p.E_IMSI)
-        self.assertError("01;;8421234567;０２５1234567;20241014114200;6;", p.E_NUM_B)  # не-ASCII цифры
+        self.assertError("01;;8421234567;０２５1234567;20241014114200;6;", p.E_NUM_B)
         self.assertError("01;;84212�4567;0251234567;20241014114200;6;", p.E_ENCODING)
 
     def test_row_hash_stable_and_distinct(self):
@@ -66,7 +66,6 @@ class ParseLineTest(unittest.TestCase):
         self.assertNotEqual(a.row_hash(), p.parse_line(VALID_01.replace(";6;", ";7;")).row_hash())
 
     def test_row_hash_canonical_format(self):
-        # Канонический конверт: поля через '|', пустые — как ''.
         import hashlib
         r = p.parse_line(VALID_01)
         expected = hashlib.sha256(b"01||8421234567|0251234567|20241014114200|6|").hexdigest()

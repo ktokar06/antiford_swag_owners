@@ -4,7 +4,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
 COPY src/ src/
 COPY index.html vite.config.js postcss.config.js tailwind.config.js ./
-# Пустой адрес API: запросы идут на тот же origin, nginx проксирует /api на backend
+
 ARG VITE_API_BASE_URL=""
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 RUN npm run build

@@ -31,7 +31,6 @@ export function getImagePreviewClassName(className, currentClassName, baselineCl
   ).join(" ")
 }
 
-/** Returns transform metadata only for canonical public Wix image URLs. */
 export function parseWixMediaUrl(src) {
   try {
     const url = new URL(src)

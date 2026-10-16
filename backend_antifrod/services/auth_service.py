@@ -12,7 +12,6 @@ from services import email_service
 
 log = logging.getLogger(__name__)
 
-# Фиктивный хеш, чтобы время ответа не выдавало существование email
 _DUMMY_HASH = hash_password(secrets.token_urlsafe(16))
 
 
@@ -53,7 +52,6 @@ def request_password_reset(db: Session, email: str) -> dict:
             email_service.send_reset_email(user.email, token)
         except Exception:
             log.exception("Не удалось отправить письмо сброса пароля")
-    # Ответ одинаковый для существующих и несуществующих адресов
     return {"status": "ok"}
 
 
